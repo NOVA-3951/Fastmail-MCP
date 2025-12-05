@@ -1,0 +1,24 @@
+startCommand:
+  type: stdio
+
+configSchema:
+  type: object
+  required:
+    - FASTMAIL_API_TOKEN
+  properties:
+    FASTMAIL_API_TOKEN:
+      type: string
+      description: "Your Fastmail API token. Get one from: https://app.fastmail.com/settings/security/tokens/new"
+
+commandFunction: |
+  (config) => ({
+    command: 'python',
+    args: ['src/fastmail_mcp.py'],
+    env: {
+      FASTMAIL_API_TOKEN: config.FASTMAIL_API_TOKEN
+    }
+  })
+
+build:
+  dockerfile: Dockerfile
+  dockerBuildPath: .

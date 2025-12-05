@@ -79,6 +79,47 @@ python /path/to/src/fastmail_mcp.py
 
 Make sure to set the `FASTMAIL_API_TOKEN` environment variable.
 
+### Smithery Deployment
+
+This server is configured for deployment on [Smithery](https://smithery.ai), a platform for hosting and sharing MCP servers.
+
+**Deploy to Smithery:**
+
+1. Push this repository to GitHub
+2. Go to the Smithery dashboard and click **"Deploy"**
+3. Select **"From GitHub"** and connect your repository
+4. Smithery will build and host your server automatically
+
+**Use via Smithery CLI:**
+
+```bash
+# Install Smithery CLI
+npm install -g @smithery/cli
+
+# Run the server with your config
+smithery run @your-username/fastmail-mcp --config '{"FASTMAIL_API_TOKEN":"your_token"}'
+```
+
+**Add to Claude Desktop via Smithery:**
+
+```json
+{
+  "mcpServers": {
+    "fastmail": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@your-username/fastmail-mcp",
+        "--config",
+        "{\"FASTMAIL_API_TOKEN\":\"your_token_here\"}"
+      ]
+    }
+  }
+}
+```
+
 ## Available Tools
 
 ### 1. search_emails

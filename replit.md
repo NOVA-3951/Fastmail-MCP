@@ -27,6 +27,9 @@ The MCP server is implemented and ready to use with MCP-compatible clients (Clau
 ├── test_connection.py         # Connection test utility
 ├── requirements.txt           # Python dependencies
 ├── .env.example              # Environment variable template
+├── Dockerfile                # Container configuration for Smithery
+├── smithery.yaml             # Smithery deployment configuration
+├── smithery.json             # Smithery registry metadata
 ├── .gitignore                # Git ignore rules
 └── README.md                 # User documentation
 ```
