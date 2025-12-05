@@ -32,6 +32,8 @@ class FastmailClient:
 
     async def make_jmap_request(self, method_calls: list) -> dict:
         await self.get_session()
+        if not self.api_url:
+            raise ValueError("API URL not available - session may have failed")
         headers = {
             "Authorization": f"Bearer {self.api_token}",
             "Content-Type": "application/json"
@@ -272,6 +274,23 @@ if __name__ == "__main__":
     import sys
     
     if len(sys.argv) > 1 and sys.argv[1] == "--http":
-        mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)
+        import uvicorn
+        from starlette.applications import Starlette
+        from starlette.routing import Mount
+        import contextlib
+        
+        mcp.settings.stateless_http = True
+        
+        @contextlib.asynccontextmanager
+        async def lifespan(app):
+            async with mcp.session_manager.run():
+                yield
+        
+        app = Starlette(
+            routes=[Mount("/", mcp.streamable_http_app())],
+            lifespan=lifespan
+        )
+        
+        uvicorn.run(app, host="0.0.0.0", port=8000)
     else:
         mcp.run(transport="stdio")

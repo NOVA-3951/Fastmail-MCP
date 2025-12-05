@@ -1,0 +1,43 @@
+[3:44:38 PM] Starting deployment...
+[3:44:40 PM] Fetching commit information...
+[3:44:40 PM] Commit: e5c8813
+[3:44:40 PM] Creating GitHub deployment...
+[3:44:41 PM] GitHub deployment initialized
+[3:44:41 PM] Cloning repository...
+[3:44:42 PM] Validating files...
+[3:44:43 PM] Build files validated
+[3:44:44 PM] Deployment credentials configured
+[3:44:44 PM] Preparing build files...
+[3:44:44 PM] Build files prepared
+[3:44:44 PM] Building Docker image...
+[3:44:46 PM] #5 transferring dockerfile: 39B 0.1s
+[3:44:46 PM] #5 transferring dockerfile: 3.49kB 0.2s done
+[3:44:46 PM] #5 DONE 0.5s
+[3:44:47 PM] #6 DONE 0.1s
+[3:44:47 PM] #7 [internal] load metadata for docker.io/library/python:3.12-slim
+[3:44:47 PM] #7 DONE 0.5s
+[3:44:47 PM] #8 [internal] load .dockerignore
+[3:44:47 PM] #8 transferring context: 0.1s
+[3:44:47 PM] #8 transferring context: 2B 0.1s done
+[3:44:48 PM] #8 DONE 0.6s
+[3:44:48 PM] #9 CACHED
+[3:44:48 PM] #10 [stage-1  1/12] FROM docker.io/library/python:3.12-slim@sha256:b43ff04d5df04ad5cabb80890b7ef74e8410e3395b19af970dcd52d7a4bff921
+[3:44:48 PM] #10 resolve docker.io/library/python:3.12-slim@sha256:b43ff04d5df04ad5cabb80890b7ef74e8410e3395b19af970dcd52d7a4bff921
+[3:44:48 PM] #10 resolve docker.io/library/python:3.12-slim@sha256:b43ff04d5df04ad5cabb80890b7ef74e8410e3395b19af970dcd52d7a4bff921 0.1s done
+[3:44:48 PM] #10 DONE 0.2s
+[3:44:48 PM] #11 [internal] load build context
+[3:44:48 PM] #11 transferring context: 71.88kB 0.3s done
+[3:44:49 PM] #11 ...
+[3:44:49 PM] #12 [stage-1  2/12] WORKDIR /app
+[3:44:49 PM] #12 CACHED
+[3:44:49 PM] #13 [stage-1  3/12] COPY requirements.txt ./
+[3:44:49 PM] #13 CACHED
+[3:44:49 PM] #14 [stage-1  4/12] RUN pip install --no-cache-dir -r requirements.txt
+[3:44:49 PM] #14 CACHED
+[3:44:49 PM] #11 [internal] load build context
+[3:44:49 PM] #11 ...
+[3:44:49 PM] #15 [stage-1  5/12] COPY . .
+[3:44:49 PM] #15 DONE 0.4s
+[3:45:03 PM] Image built successfully
+[3:45:03 PM] Deploying image...
+[3:46:07 PM] Deploy failed: Failed to deploy image. This appears to be a system issue. Please try again in a few moments.
