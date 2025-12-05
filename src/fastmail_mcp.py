@@ -2,14 +2,8 @@
 import os
 import asyncio
 import httpx
-from typing import Any, Optional
-from mcp.server.models import InitializationOptions
-from mcp.server import NotificationOptions, Server
-from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
-from dotenv import load_dotenv
-
-load_dotenv()
+from typing import Optional
+from mcp.server.fastmcp import FastMCP
 
 FASTMAIL_API_TOKEN = os.getenv("FASTMAIL_API_TOKEN", "")
 SESSION_URL = "https://api.fastmail.com/jmap/session"
@@ -90,7 +84,8 @@ class FastmailClient:
             ["Email/get", {
                 "accountId": self.account_id,
                 "ids": [email_id],
-                "properties": ["id", "subject", "from", "to", "cc", "bcc", "receivedAt", "sentAt", "textBody", "htmlBody", "bodyValues", "attachments"]
+                "properties": ["id", "subject", "from", "to", "cc", "bcc", "receivedAt", "sentAt", "textBody", "htmlBody", "bodyValues", "attachments"],
+                "fetchTextBodyValues": True
             }, "g1"]
         ]
         
@@ -122,205 +117,161 @@ class FastmailClient:
         await self.client.aclose()
 
 
-async def main():
-    if not FASTMAIL_API_TOKEN:
-        raise ValueError("FASTMAIL_API_TOKEN environment variable must be set")
+mcp = FastMCP("fastmail-mcp")
+fastmail_client = None
 
-    fastmail_client = FastmailClient(FASTMAIL_API_TOKEN)
+
+def get_client() -> FastmailClient:
+    global fastmail_client
+    if fastmail_client is None:
+        token = os.getenv("FASTMAIL_API_TOKEN", "")
+        if not token:
+            raise ValueError("FASTMAIL_API_TOKEN environment variable must be set")
+        fastmail_client = FastmailClient(token)
+    return fastmail_client
+
+
+@mcp.tool()
+async def search_emails(query: str = "", limit: int = 10, mailbox: str = "") -> str:
+    """Search emails in your Fastmail account. You can search by text query and optionally filter by mailbox (e.g., 'inbox', 'sent', 'archive').
     
-    server = Server("fastmail-mcp")
-
-    @server.list_tools()
-    async def handle_list_tools() -> list[Tool]:
-        return [
-            Tool(
-                name="search_emails",
-                description="Search emails in your Fastmail account. You can search by text query and optionally filter by mailbox (e.g., 'inbox', 'sent', 'archive').",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "query": {
-                            "type": "string",
-                            "description": "Search query text to find in emails (searches subject, body, from, to). Leave empty to get recent emails."
-                        },
-                        "limit": {
-                            "type": "number",
-                            "description": "Maximum number of emails to return (default: 10, max: 50)",
-                            "default": 10
-                        },
-                        "mailbox": {
-                            "type": "string",
-                            "description": "Filter by mailbox name (e.g., 'inbox', 'sent', 'archive', 'trash'). Optional."
-                        }
-                    }
-                }
-            ),
-            Tool(
-                name="get_email",
-                description="Get the full content of a specific email by its ID, including body, attachments, and all metadata.",
-                inputSchema={
-                    "type": "object",
-                    "properties": {
-                        "email_id": {
-                            "type": "string",
-                            "description": "The unique ID of the email to retrieve"
-                        }
-                    },
-                    "required": ["email_id"]
-                }
-            ),
-            Tool(
-                name="list_mailboxes",
-                description="List all mailboxes in your Fastmail account with their names, roles, and email counts.",
-                inputSchema={
-                    "type": "object",
-                    "properties": {}
-                }
-            )
-        ]
-
-    @server.call_tool()
-    async def handle_call_tool(name: str, arguments: dict | None) -> list[TextContent]:
-        if arguments is None:
-            arguments = {}
-
-        try:
-            if name == "search_emails":
-                query = arguments.get("query", "")
-                limit = min(int(arguments.get("limit", 10)), 50)
-                mailbox = arguments.get("mailbox")
-                
-                result = await fastmail_client.search_emails(query, limit, mailbox)
-                
-                emails = []
-                for response in result.get("methodResponses", []):
-                    if response[0] == "Email/get":
-                        emails = response[1].get("list", [])
-                        break
-                
-                if not emails:
-                    return [TextContent(
-                        type="text",
-                        text="No emails found matching your search criteria."
-                    )]
-                
-                formatted_emails = []
-                for email in emails:
-                    from_addr = email.get("from", [{}])[0].get("email", "Unknown")
-                    from_name = email.get("from", [{}])[0].get("name", "")
-                    formatted_emails.append(
-                        f"ID: {email['id']}\n"
-                        f"Subject: {email.get('subject', 'No subject')}\n"
-                        f"From: {from_name} <{from_addr}>\n"
-                        f"Date: {email.get('receivedAt', 'Unknown')}\n"
-                        f"Preview: {email.get('preview', '')}\n"
-                    )
-                
-                return [TextContent(
-                    type="text",
-                    text=f"Found {len(emails)} email(s):\n\n" + "\n---\n".join(formatted_emails)
-                )]
-            
-            elif name == "get_email":
-                email_id = arguments.get("email_id")
-                if not email_id:
-                    return [TextContent(type="text", text="Error: email_id is required")]
-                
-                result = await fastmail_client.get_email(email_id)
-                
-                email = None
-                for response in result.get("methodResponses", []):
-                    if response[0] == "Email/get":
-                        emails_list = response[1].get("list", [])
-                        if emails_list:
-                            email = emails_list[0]
-                        break
-                
-                if not email:
-                    return [TextContent(type="text", text=f"Email with ID {email_id} not found")]
-                
-                from_addr = email.get("from", [{}])[0].get("email", "Unknown")
-                from_name = email.get("from", [{}])[0].get("name", "")
-                to_list = ", ".join([f"{t.get('name', '')} <{t.get('email', '')}>" for t in email.get("to", [])])
-                
-                body_text = ""
-                text_body_ids = email.get("textBody", [])
-                body_values = email.get("bodyValues", {})
-                
-                if text_body_ids and body_values:
-                    for part_id in text_body_ids:
-                        if part_id in body_values:
-                            body_text = body_values[part_id].get("value", "")
-                            break
-                
-                attachments_info = ""
-                if email.get("attachments"):
-                    attachments_info = "\n\nAttachments:\n" + "\n".join([
-                        f"- {att.get('name', 'Unknown')} ({att.get('type', 'Unknown type')}, {att.get('size', 0)} bytes)"
-                        for att in email["attachments"]
-                    ])
-                
-                formatted_email = (
-                    f"Subject: {email.get('subject', 'No subject')}\n"
-                    f"From: {from_name} <{from_addr}>\n"
-                    f"To: {to_list}\n"
-                    f"Date: {email.get('receivedAt', 'Unknown')}\n"
-                    f"{attachments_info}\n"
-                    f"\n--- Email Body ---\n{body_text}"
-                )
-                
-                return [TextContent(type="text", text=formatted_email)]
-            
-            elif name == "list_mailboxes":
-                result = await fastmail_client.list_mailboxes()
-                
-                mailboxes = []
-                for response in result.get("methodResponses", []):
-                    if response[0] == "Mailbox/get":
-                        mailboxes = response[1].get("list", [])
-                        break
-                
-                if not mailboxes:
-                    return [TextContent(type="text", text="No mailboxes found")]
-                
-                formatted_mailboxes = []
-                for mailbox in mailboxes:
-                    formatted_mailboxes.append(
-                        f"Name: {mailbox.get('name', 'Unknown')}\n"
-                        f"ID: {mailbox['id']}\n"
-                        f"Role: {mailbox.get('role', 'None')}\n"
-                        f"Total Emails: {mailbox.get('totalEmails', 0)}\n"
-                        f"Unread Emails: {mailbox.get('unreadEmails', 0)}"
-                    )
-                
-                return [TextContent(
-                    type="text",
-                    text=f"Found {len(mailboxes)} mailbox(es):\n\n" + "\n---\n".join(formatted_mailboxes)
-                )]
-            
-            else:
-                return [TextContent(type="text", text=f"Unknown tool: {name}")]
-                
-        except Exception as e:
-            return [TextContent(type="text", text=f"Error: {str(e)}")]
-
+    Args:
+        query: Search query text to find in emails (searches subject, body, from, to). Leave empty to get recent emails.
+        limit: Maximum number of emails to return (default: 10, max: 50)
+        mailbox: Filter by mailbox name (e.g., 'inbox', 'sent', 'archive', 'trash'). Optional.
+    """
     try:
-        async with stdio_server() as (read_stream, write_stream):
-            await server.run(
-                read_stream,
-                write_stream,
-                InitializationOptions(
-                    server_name="fastmail-mcp",
-                    server_version="1.0.0",
-                    capabilities=server.get_capabilities(
-                        notification_options=NotificationOptions(),
-                        experimental_capabilities={}
-                    )
-                )
+        client = get_client()
+        limit = min(int(limit), 50)
+        mailbox_filter = mailbox if mailbox else None
+        
+        result = await client.search_emails(query, limit, mailbox_filter)
+        
+        emails = []
+        for response in result.get("methodResponses", []):
+            if response[0] == "Email/get":
+                emails = response[1].get("list", [])
+                break
+        
+        if not emails:
+            return "No emails found matching your search criteria."
+        
+        formatted_emails = []
+        for email in emails:
+            from_addr = email.get("from", [{}])[0].get("email", "Unknown")
+            from_name = email.get("from", [{}])[0].get("name", "")
+            formatted_emails.append(
+                f"ID: {email['id']}\n"
+                f"Subject: {email.get('subject', 'No subject')}\n"
+                f"From: {from_name} <{from_addr}>\n"
+                f"Date: {email.get('receivedAt', 'Unknown')}\n"
+                f"Preview: {email.get('preview', '')}\n"
             )
-    finally:
-        await fastmail_client.close()
+        
+        return f"Found {len(emails)} email(s):\n\n" + "\n---\n".join(formatted_emails)
+        
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+@mcp.tool()
+async def get_email(email_id: str) -> str:
+    """Get the full content of a specific email by its ID, including body, attachments, and all metadata.
+    
+    Args:
+        email_id: The unique ID of the email to retrieve
+    """
+    try:
+        if not email_id:
+            return "Error: email_id is required"
+        
+        client = get_client()
+        result = await client.get_email(email_id)
+        
+        email = None
+        for response in result.get("methodResponses", []):
+            if response[0] == "Email/get":
+                emails_list = response[1].get("list", [])
+                if emails_list:
+                    email = emails_list[0]
+                break
+        
+        if not email:
+            return f"Email with ID {email_id} not found"
+        
+        from_addr = email.get("from", [{}])[0].get("email", "Unknown")
+        from_name = email.get("from", [{}])[0].get("name", "")
+        to_list = ", ".join([f"{t.get('name', '')} <{t.get('email', '')}>" for t in email.get("to", [])])
+        
+        body_text = ""
+        text_body_ids = email.get("textBody", [])
+        body_values = email.get("bodyValues", {})
+        
+        if text_body_ids and body_values:
+            for part in text_body_ids:
+                part_id = part.get("partId") if isinstance(part, dict) else part
+                if part_id in body_values:
+                    body_text = body_values[part_id].get("value", "")
+                    break
+        
+        attachments_info = ""
+        if email.get("attachments"):
+            attachments_info = "\n\nAttachments:\n" + "\n".join([
+                f"- {att.get('name', 'Unknown')} ({att.get('type', 'Unknown type')}, {att.get('size', 0)} bytes)"
+                for att in email["attachments"]
+            ])
+        
+        formatted_email = (
+            f"Subject: {email.get('subject', 'No subject')}\n"
+            f"From: {from_name} <{from_addr}>\n"
+            f"To: {to_list}\n"
+            f"Date: {email.get('receivedAt', 'Unknown')}\n"
+            f"{attachments_info}\n"
+            f"\n--- Email Body ---\n{body_text}"
+        )
+        
+        return formatted_email
+        
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+@mcp.tool()
+async def list_mailboxes() -> str:
+    """List all mailboxes in your Fastmail account with their names, roles, and email counts."""
+    try:
+        client = get_client()
+        result = await client.list_mailboxes()
+        
+        mailboxes = []
+        for response in result.get("methodResponses", []):
+            if response[0] == "Mailbox/get":
+                mailboxes = response[1].get("list", [])
+                break
+        
+        if not mailboxes:
+            return "No mailboxes found"
+        
+        formatted_mailboxes = []
+        for mailbox in mailboxes:
+            formatted_mailboxes.append(
+                f"Name: {mailbox.get('name', 'Unknown')}\n"
+                f"ID: {mailbox['id']}\n"
+                f"Role: {mailbox.get('role', 'None')}\n"
+                f"Total Emails: {mailbox.get('totalEmails', 0)}\n"
+                f"Unread Emails: {mailbox.get('unreadEmails', 0)}"
+            )
+        
+        return f"Found {len(mailboxes)} mailbox(es):\n\n" + "\n---\n".join(formatted_mailboxes)
+        
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    import sys
+    
+    if len(sys.argv) > 1 and sys.argv[1] == "--http":
+        mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)
+    else:
+        mcp.run(transport="stdio")

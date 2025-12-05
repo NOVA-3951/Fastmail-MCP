@@ -13,6 +13,10 @@ This is an MCP (Model Context Protocol) server that enables AI assistants like C
 The MCP server is implemented and ready to use with MCP-compatible clients (Claude Desktop, VS Code, Cursor, etc.).
 
 ## Recent Changes
+- 2024-12-05: Added Smithery deployment configuration
+  - Added HTTP transport support (Streamable HTTP)
+  - Server can run in stdio mode (local) or HTTP mode (Smithery)
+  - Users provide API token via Smithery's config flow
 - 2024-12-05: Initial implementation with JMAP API integration
 - Added three core tools: search_emails, get_email, list_mailboxes
 - Implemented async FastmailClient with session management
@@ -51,9 +55,15 @@ The MCP server is implemented and ready to use with MCP-compatible clients (Clau
    - Secure environment variable storage
 
 ### Dependencies
-- mcp>=1.1.0: MCP SDK for server implementation
+- mcp[cli]>=1.1.0: MCP SDK for server implementation (includes FastMCP)
 - httpx>=0.27.0: Async HTTP client for JMAP API
 - python-dotenv>=1.0.0: Environment variable management
+- uvicorn>=0.30.0: ASGI server for HTTP transport
+- starlette>=0.38.0: Web framework for HTTP transport
+
+### Transport Modes
+- **stdio**: Default mode for local use with Claude Desktop
+- **HTTP (Streamable HTTP)**: For Smithery deployment and remote access
 
 ## Usage
 
