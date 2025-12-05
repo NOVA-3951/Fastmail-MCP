@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "fastmail": {
+      "command": "python",
+      "args": ["/absolute/path/to/fastmail-mcp/src/fastmail_mcp.py"],
+      "env": {
+        "FASTMAIL_API_TOKEN": "your_fastmail_api_token_here"
+      }
+    }
+  }
+}
