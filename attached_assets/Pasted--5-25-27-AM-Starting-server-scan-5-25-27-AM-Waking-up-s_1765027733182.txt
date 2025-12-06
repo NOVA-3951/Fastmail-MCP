@@ -1,0 +1,36 @@
+[5:25:27 AM] Starting server scan
+[5:25:27 AM] Waking up server...
+[5:25:27 AM] Setting up authentication...
+[5:25:27 AM] Using test profile configuration
+[5:26:28 AM] Server added to test profile
+[5:26:28 AM] Scanning MCP capabilities...
+[5:27:01 AM] MCP Server Card not found (notFound), proceeding with connection scan
+[5:27:01 AM] Failed to fetch .well-known/mcp-config
+[5:27:01 AM] Scanning MCP server: https://smithery.run/sessions/variable-earwig-c1ZHPa/fastmail/mcp
+[5:27:11 AM] HTTP POST → undefined (10001ms)
+[5:27:11 AM] Request: {"jsonrpc":"2.0","id":794956894,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"smithery-scanner","version":"1.0.0"}}}
+[5:27:11 AM] HTTP error: This operation was aborted
+[5:27:22 AM] HTTP POST → undefined (10001ms)
+[5:27:22 AM] Request: {"jsonrpc":"2.0","id":281403536,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"smithery-scanner","version":"1.0.0"}}}
+[5:27:22 AM] HTTP error: This operation was aborted
+[5:27:32 AM] HTTP POST → undefined (10001ms)
+[5:27:32 AM] Request: {"jsonrpc":"2.0","id":454294872,"method":"tools/list","params":{}}
+[5:27:32 AM] HTTP error: This operation was aborted
+[5:27:32 AM] HTTP POST → undefined (10003ms)
+[5:27:32 AM] Request: {"jsonrpc":"2.0","id":249696242,"method":"resources/list","params":{}}
+[5:27:32 AM] HTTP error: This operation was aborted
+[5:27:32 AM] HTTP POST → undefined (10003ms)
+[5:27:32 AM] Request: {"jsonrpc":"2.0","id":218810254,"method":"prompts/list","params":{}}
+[5:27:32 AM] HTTP error: This operation was aborted
+[5:27:43 AM] HTTP POST → undefined (10002ms)
+[5:27:43 AM] Request: {"jsonrpc":"2.0","id":557288591,"method":"tools/list","params":{}}
+[5:27:43 AM] HTTP error: This operation was aborted
+[5:27:43 AM] HTTP POST → undefined (10002ms)
+[5:27:43 AM] Request: {"jsonrpc":"2.0","id":842186615,"method":"resources/list","params":{}}
+[5:27:43 AM] HTTP error: This operation was aborted
+[5:27:43 AM] HTTP POST → undefined (10002ms)
+[5:27:43 AM] Request: {"jsonrpc":"2.0","id":81336653,"method":"prompts/list","params":{}}
+[5:27:43 AM] HTTP error: This operation was aborted
+[5:27:43 AM] Extracted 0 tools
+[5:27:43 AM] Capabilities found: 0 tools, 0 prompts, 0 resources
+[5:27:43 AM] Scan completed: 0 tools, 0 prompts, 0 resources

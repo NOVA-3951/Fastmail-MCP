@@ -13,6 +13,11 @@ This is an MCP (Model Context Protocol) server that enables AI assistants like C
 The MCP server is implemented and ready to use with MCP-compatible clients (Claude Desktop, VS Code, Cursor, etc.).
 
 ## Recent Changes
+- 2024-12-06: Fixed Smithery deployment
+  - Switched to Docker runtime for reliable HTTP deployment
+  - Created explicit main.py entry point for HTTP server
+  - Moved fastmail_mcp.py to root level for simpler imports
+  - Server now properly binds to port 8000 with Streamable HTTP transport
 - 2024-12-06: Enhanced Smithery quality score
   - Added tool annotations (readOnlyHint, destructiveHint, idempotentHint, openWorldHint)
   - Added MCP prompts (check_inbox, search_from_sender, check_unread, find_attachments)
@@ -32,13 +37,15 @@ The MCP server is implemented and ready to use with MCP-compatible clients (Clau
 
 ### Structure
 ```
-├── fastmail_mcp.py            # Main MCP server implementation (root level for Smithery)
+├── fastmail_mcp.py            # Main MCP server implementation
+├── main.py                    # HTTP entry point for Smithery deployment
+├── Dockerfile                 # Docker container configuration for Smithery
 ├── src/
 │   └── fastmail_mcp.py        # MCP server (legacy path, kept for compatibility)
 ├── test_connection.py         # Connection test utility
 ├── requirements.txt           # Python dependencies
 ├── pyproject.toml             # Python project config with Smithery settings
-├── smithery.yaml              # Smithery deployment configuration
+├── smithery.yaml              # Smithery deployment configuration (uses Docker runtime)
 ├── smithery.json              # Smithery registry metadata
 ├── .env.example               # Environment variable template
 ├── .gitignore                 # Git ignore rules
