@@ -1,0 +1,179 @@
+[5:11:37 AM] Starting deployment...
+[5:11:38 AM] Fetching commit information...
+[5:11:38 AM] Commit: 330afa8
+[5:11:38 AM] Creating GitHub deployment...
+[5:11:38 AM] GitHub deployment initialized
+[5:11:38 AM] Cloning repository...
+[5:11:39 AM] Validating files...
+[5:11:39 AM] Deploy failed: Failed to validate smithery.yaml configuration. Check your smithery.yaml configuration schema. See the documentation for correct format.
+  Cause: {
+  "zodError": {
+    "name": "ZodError",
+    "issues": [
+      {
+        "code": "invalid_union",
+        "path": [],
+        "message": "Invalid input",
+        "unionErrors": [
+          {
+            "name": "ZodError",
+            "issues": [
+              {
+                "code": "invalid_literal",
+                "path": [
+                  "runtime"
+                ],
+                "message": "Invalid literal value, expected \"typescript\"",
+                "expected": "typescript",
+                "received": "container"
+              }
+            ]
+          },
+          {
+            "name": "ZodError",
+            "issues": [
+              {
+                "code": "invalid_literal",
+                "path": [
+                  "runtime"
+                ],
+                "message": "Invalid literal value, expected \"python\"",
+                "expected": "python",
+                "received": "container"
+              }
+            ]
+          },
+          {
+            "name": "ZodError",
+            "issues": [
+              {
+                "code": "invalid_union",
+                "path": [
+                  "startCommand",
+                  "configSchema"
+                ],
+                "message": "Invalid input",
+                "unionErrors": [
+                  {
+                    "name": "ZodError",
+                    "issues": [
+                      {
+                        "code": "invalid_enum_value",
+                        "path": [
+                          "startCommand",
+                          "configSchema",
+                          "type"
+                        ],
+                        "message": "Invalid enum value. Expected 'string' | 'number' | 'boolean' | 'null', received 'object'",
+                        "options": [
+                          "string",
+                          "number",
+                          "boolean",
+                          "null"
+                        ],
+                        "received": "object"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "ZodError",
+                    "issues": [
+                      {
+                        "code": "invalid_union",
+                        "path": [
+                          "startCommand",
+                          "configSchema",
+                          "properties",
+                          "maxResults"
+                        ],
+                        "message": "Invalid input",
+                        "unionErrors": [
+                          {
+                            "name": "ZodError",
+                            "issues": [
+                              {
+                                "code": "invalid_enum_value",
+                                "path": [
+                                  "startCommand",
+                                  "configSchema",
+                                  "properties",
+                                  "maxResults",
+                                  "type"
+                                ],
+                                "message": "Invalid enum value. Expected 'string' | 'number' | 'boolean' | 'null', received 'integer'",
+                                "options": [
+                                  "string",
+                                  "number",
+                                  "boolean",
+                                  "null"
+                                ],
+                                "received": "integer"
+                              }
+                            ]
+                          },
+                          {
+                            "name": "ZodError",
+                            "issues": [
+                              {
+                                "code": "invalid_literal",
+                                "path": [
+                                  "startCommand",
+                                  "configSchema",
+                                  "properties",
+                                  "maxResults",
+                                  "type"
+                                ],
+                                "message": "Invalid literal value, expected \"object\"",
+                                "expected": "object",
+                                "received": "integer"
+                              }
+                            ]
+                          },
+                          {
+                            "name": "ZodError",
+                            "issues": [
+                              {
+                                "code": "invalid_literal",
+                                "path": [
+                                  "startCommand",
+                                  "configSchema",
+                                  "properties",
+                                  "maxResults",
+                                  "type"
+                                ],
+                                "message": "Invalid literal value, expected \"array\"",
+                                "expected": "array",
+                                "received": "integer"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "ZodError",
+                    "issues": [
+                      {
+                        "code": "invalid_literal",
+                        "path": [
+                          "startCommand",
+                          "configSchema",
+                          "type"
+                        ],
+                        "message": "Invalid literal value, expected \"array\"",
+                        "expected": "array",
+                        "received": "object"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "errorType": "configParseError"
+}
