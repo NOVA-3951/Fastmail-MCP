@@ -1,5 +1,7 @@
 # Fastmail MCP Server
 
+[![smithery badge](https://smithery.ai/badge/@NOVA-3951/fastmail)](https://smithery.ai/server/@NOVA-3951/fastmail)
+
 An MCP (Model Context Protocol) server that provides AI assistants with secure access to your Fastmail emails via the JMAP API.
 
 ## Features
