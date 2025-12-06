@@ -4,6 +4,7 @@ import asyncio
 import httpx
 from typing import Optional
 from mcp.server.fastmcp import FastMCP
+from mcp.types import TextContent, ToolAnnotations
 
 FASTMAIL_API_TOKEN = os.getenv("FASTMAIL_API_TOKEN", "")
 SESSION_URL = "https://api.fastmail.com/jmap/session"
@@ -119,7 +120,14 @@ class FastmailClient:
         await self.client.aclose()
 
 
-mcp = FastMCP("fastmail-mcp")
+mcp = FastMCP(
+    "fastmail-mcp",
+    instructions="""You are an AI assistant with access to the user's Fastmail email account. 
+You can search emails, read email content, and list mailboxes. 
+Always be helpful and respect user privacy. 
+When searching, provide clear summaries of found emails.
+When reading emails, present the content in a readable format."""
+)
 fastmail_client = None
 
 
@@ -133,14 +141,32 @@ def get_client() -> FastmailClient:
     return fastmail_client
 
 
-@mcp.tool()
-async def search_emails(query: str = "", limit: int = 10, mailbox: str = "") -> str:
-    """Search emails in your Fastmail account. You can search by text query and optionally filter by mailbox (e.g., 'inbox', 'sent', 'archive').
+@mcp.tool(
+    annotations=ToolAnnotations(
+        title="Search Emails",
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=True,
+        openWorldHint=True
+    )
+)
+async def search_emails(
+    query: str = "",
+    limit: int = 10,
+    mailbox: str = ""
+) -> str:
+    """Search emails in your Fastmail account by text query and optionally filter by mailbox.
+    
+    This tool searches across email subjects, bodies, sender addresses, and recipient addresses.
+    Results are sorted by date with the most recent emails first.
     
     Args:
-        query: Search query text to find in emails (searches subject, body, from, to). Leave empty to get recent emails.
-        limit: Maximum number of emails to return (default: 10, max: 50)
-        mailbox: Filter by mailbox name (e.g., 'inbox', 'sent', 'archive', 'trash'). Optional.
+        query: Search query text to find in emails. Searches subject, body, from, and to fields. Leave empty to get the most recent emails.
+        limit: Maximum number of emails to return. Default is 10, maximum allowed is 50. Use smaller values for faster responses.
+        mailbox: Filter results to a specific mailbox/folder. Common values: 'inbox', 'sent', 'drafts', 'archive', 'trash', 'spam'. Leave empty to search all mailboxes.
+    
+    Returns:
+        A formatted list of matching emails with ID, subject, sender, date, and preview.
     """
     try:
         client = get_client()
@@ -173,19 +199,33 @@ async def search_emails(query: str = "", limit: int = 10, mailbox: str = "") -> 
         return f"Found {len(emails)} email(s):\n\n" + "\n---\n".join(formatted_emails)
         
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"Error searching emails: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(
+    annotations=ToolAnnotations(
+        title="Get Email Content",
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=True,
+        openWorldHint=False
+    )
+)
 async def get_email(email_id: str) -> str:
-    """Get the full content of a specific email by its ID, including body, attachments, and all metadata.
+    """Retrieve the full content of a specific email by its unique ID.
+    
+    This tool fetches complete email details including the full body text,
+    attachment information, and all metadata. Use the email ID from search results.
     
     Args:
-        email_id: The unique ID of the email to retrieve
+        email_id: The unique identifier of the email to retrieve. Obtain this from the search_emails tool results.
+    
+    Returns:
+        The complete email with subject, sender, recipients, date, body text, and attachment list.
     """
     try:
         if not email_id:
-            return "Error: email_id is required"
+            return "Error: email_id is required. Use search_emails first to find email IDs."
         
         client = get_client()
         result = await client.get_email(email_id)
@@ -199,11 +239,12 @@ async def get_email(email_id: str) -> str:
                 break
         
         if not email:
-            return f"Email with ID {email_id} not found"
+            return f"Email with ID '{email_id}' not found. The email may have been deleted or the ID may be incorrect."
         
         from_addr = email.get("from", [{}])[0].get("email", "Unknown")
         from_name = email.get("from", [{}])[0].get("name", "")
         to_list = ", ".join([f"{t.get('name', '')} <{t.get('email', '')}>" for t in email.get("to", [])])
+        cc_list = ", ".join([f"{t.get('name', '')} <{t.get('email', '')}>" for t in email.get("cc", [])]) if email.get("cc") else ""
         
         body_text = ""
         text_body_ids = email.get("textBody", [])
@@ -223,10 +264,13 @@ async def get_email(email_id: str) -> str:
                 for att in email["attachments"]
             ])
         
+        cc_line = f"\nCC: {cc_list}" if cc_list else ""
+        
         formatted_email = (
             f"Subject: {email.get('subject', 'No subject')}\n"
             f"From: {from_name} <{from_addr}>\n"
-            f"To: {to_list}\n"
+            f"To: {to_list}"
+            f"{cc_line}\n"
             f"Date: {email.get('receivedAt', 'Unknown')}\n"
             f"{attachments_info}\n"
             f"\n--- Email Body ---\n{body_text}"
@@ -235,12 +279,28 @@ async def get_email(email_id: str) -> str:
         return formatted_email
         
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"Error retrieving email: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(
+    annotations=ToolAnnotations(
+        title="List Mailboxes",
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=True,
+        openWorldHint=False
+    )
+)
 async def list_mailboxes() -> str:
-    """List all mailboxes in your Fastmail account with their names, roles, and email counts."""
+    """List all mailboxes (folders) in your Fastmail account with email counts.
+    
+    This tool retrieves all available mailboxes including inbox, sent, drafts,
+    archive, trash, spam, and any custom folders. Shows the total and unread
+    email count for each mailbox.
+    
+    Returns:
+        A formatted list of all mailboxes with their names, roles, total emails, and unread counts.
+    """
     try:
         client = get_client()
         result = await client.list_mailboxes()
@@ -252,20 +312,99 @@ async def list_mailboxes() -> str:
                 break
         
         if not mailboxes:
-            return "No mailboxes found"
+            return "No mailboxes found in this account."
         
         formatted_mailboxes = []
         for mailbox in mailboxes:
+            role = mailbox.get('role', 'custom')
             formatted_mailboxes.append(
                 f"Name: {mailbox.get('name', 'Unknown')}\n"
-                f"ID: {mailbox['id']}\n"
-                f"Role: {mailbox.get('role', 'None')}\n"
+                f"Role: {role if role else 'custom'}\n"
                 f"Total Emails: {mailbox.get('totalEmails', 0)}\n"
                 f"Unread Emails: {mailbox.get('unreadEmails', 0)}"
             )
         
         return f"Found {len(mailboxes)} mailbox(es):\n\n" + "\n---\n".join(formatted_mailboxes)
         
+    except Exception as e:
+        return f"Error listing mailboxes: {str(e)}"
+
+
+@mcp.prompt()
+def check_inbox() -> str:
+    """Check your inbox for recent emails."""
+    return "Please show me my most recent emails from my inbox. Use the search_emails tool with mailbox='inbox' and limit=10."
+
+
+@mcp.prompt()
+def search_from_sender(sender: str) -> str:
+    """Search for emails from a specific sender."""
+    return f"Please search for all emails from {sender}. Use the search_emails tool with query='{sender}'."
+
+
+@mcp.prompt()
+def check_unread() -> str:
+    """Check for unread emails across all mailboxes."""
+    return "Please list all my mailboxes and tell me which ones have unread emails. Use the list_mailboxes tool."
+
+
+@mcp.prompt()
+def find_attachments(topic: str) -> str:
+    """Find emails with attachments about a topic."""
+    return f"Please search for emails about '{topic}' and show me which ones have attachments. Use search_emails to find them, then use get_email on promising results to check for attachments."
+
+
+@mcp.resource("mailboxes://list")
+async def get_mailboxes_resource() -> str:
+    """List of all mailboxes in the Fastmail account."""
+    try:
+        client = get_client()
+        result = await client.list_mailboxes()
+        
+        mailboxes = []
+        for response in result.get("methodResponses", []):
+            if response[0] == "Mailbox/get":
+                mailboxes = response[1].get("list", [])
+                break
+        
+        if not mailboxes:
+            return "No mailboxes found."
+        
+        lines = ["# Fastmail Mailboxes", ""]
+        for mb in mailboxes:
+            role = mb.get('role', 'custom') or 'custom'
+            lines.append(f"- **{mb.get('name', 'Unknown')}** ({role}): {mb.get('totalEmails', 0)} total, {mb.get('unreadEmails', 0)} unread")
+        
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+@mcp.resource("emails://recent")
+async def get_recent_emails_resource() -> str:
+    """Most recent 10 emails from the inbox."""
+    try:
+        client = get_client()
+        result = await client.search_emails("", 10, "inbox")
+        
+        emails = []
+        for response in result.get("methodResponses", []):
+            if response[0] == "Email/get":
+                emails = response[1].get("list", [])
+                break
+        
+        if not emails:
+            return "No recent emails found."
+        
+        lines = ["# Recent Emails", ""]
+        for email in emails:
+            from_addr = email.get("from", [{}])[0].get("email", "Unknown")
+            from_name = email.get("from", [{}])[0].get("name", from_addr)
+            subject = email.get('subject', 'No subject')
+            date = email.get('receivedAt', 'Unknown')
+            lines.append(f"- **{subject}** from {from_name} ({date})")
+        
+        return "\n".join(lines)
     except Exception as e:
         return f"Error: {str(e)}"
 

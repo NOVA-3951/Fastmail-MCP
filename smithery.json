@@ -1,18 +1,75 @@
 {
+  "$schema": "https://smithery.ai/schema/server.json",
   "name": "Fastmail MCP Server",
-  "description": "A Model Context Protocol server that enables AI assistants to access and search Fastmail emails via the JMAP API. Provides secure, read-only access to search emails, view email content, and list mailboxes.",
+  "displayName": "Fastmail Email Access",
+  "description": "A Model Context Protocol server that provides AI assistants with secure, read-only access to your Fastmail email account via the JMAP API. Search emails by text or sender, read full email content with attachments, and list all mailboxes with unread counts.",
+  "vendor": "Community",
+  "homepage": "https://github.com/your-username/fastmail-mcp",
+  "icon": "https://www.fastmail.com/favicon.ico",
+  "license": "MIT",
   "tags": [
     "fastmail",
     "email",
     "jmap",
     "mail",
     "search",
-    "inbox"
+    "inbox",
+    "productivity",
+    "communication"
   ],
   "examples": [
     "Search my inbox for emails from John",
-    "List all my mailboxes",
-    "Show me recent unread emails",
-    "Get the full content of a specific email"
+    "Show me my recent unread emails",
+    "List all my mailboxes and their unread counts",
+    "Find emails about the project deadline",
+    "Get the full content of that email",
+    "Check if I have any emails from support@company.com"
+  ],
+  "capabilities": {
+    "tools": true,
+    "prompts": true,
+    "resources": true
+  },
+  "tools": [
+    {
+      "name": "search_emails",
+      "description": "Search emails by text query across subject, body, and sender fields. Filter by mailbox and limit results."
+    },
+    {
+      "name": "get_email",
+      "description": "Retrieve the full content of a specific email including body text, metadata, and attachment information."
+    },
+    {
+      "name": "list_mailboxes",
+      "description": "List all mailboxes/folders in the account with total and unread email counts."
+    }
+  ],
+  "prompts": [
+    {
+      "name": "check_inbox",
+      "description": "Check your inbox for the most recent emails."
+    },
+    {
+      "name": "search_from_sender",
+      "description": "Search for all emails from a specific sender."
+    },
+    {
+      "name": "check_unread",
+      "description": "Check which mailboxes have unread emails."
+    },
+    {
+      "name": "find_attachments",
+      "description": "Find emails with attachments about a specific topic."
+    }
+  ],
+  "resources": [
+    {
+      "uri": "mailboxes://list",
+      "description": "List of all mailboxes in the Fastmail account with email counts."
+    },
+    {
+      "uri": "emails://recent",
+      "description": "Most recent 10 emails from the inbox."
+    }
   ]
 }

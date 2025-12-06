@@ -5,14 +5,39 @@ startCommand:
   configSchema:
     type: object
     required:
-      - FASTMAIL_API_TOKEN
+      - fastmailApiToken
     properties:
-      FASTMAIL_API_TOKEN:
+      fastmailApiToken:
         type: string
         title: Fastmail API Token
-        description: "Your Fastmail API token. Get one from: https://app.fastmail.com/settings/security/tokens/new"
+        description: Your Fastmail API token for authentication. Create one at https://app.fastmail.com/settings/security/tokens/new with 'urn:ietf:params:jmap:core' and 'urn:ietf:params:jmap:mail' scopes.
+        minLength: 10
+      defaultMailbox:
+        type: string
+        title: Default Mailbox
+        description: Optional default mailbox to search when none is specified. Common values are 'inbox', 'sent', 'archive'.
+        default: ""
+      maxResults:
+        type: integer
+        title: Maximum Results
+        description: Optional maximum number of emails to return in search results. Default is 10, maximum is 50.
+        default: 10
+        minimum: 1
+        maximum: 50
+  commandFunction: |-
+    (config) => ({
+      command: 'python',
+      args: ['src/fastmail_mcp.py', '--http'],
+      env: {
+        FASTMAIL_API_TOKEN: config.fastmailApiToken,
+        DEFAULT_MAILBOX: config.defaultMailbox || '',
+        MAX_RESULTS: String(config.maxResults || 10)
+      }
+    })
   exampleConfig:
-    FASTMAIL_API_TOKEN: "fmu1-xxxxxxxx-xxxxxxxxxxxxxxxx"
+    fastmailApiToken: "fmu1-xxxxxxxx-xxxxxxxxxxxxxxxx"
+    defaultMailbox: "inbox"
+    maxResults: 10
 
 build:
   dockerfile: Dockerfile

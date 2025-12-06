@@ -13,6 +13,12 @@ This is an MCP (Model Context Protocol) server that enables AI assistants like C
 The MCP server is implemented and ready to use with MCP-compatible clients (Claude Desktop, VS Code, Cursor, etc.).
 
 ## Recent Changes
+- 2024-12-06: Enhanced Smithery quality score
+  - Added tool annotations (readOnlyHint, destructiveHint, idempotentHint, openWorldHint)
+  - Added MCP prompts (check_inbox, search_from_sender, check_unread, find_attachments)
+  - Added MCP resources (mailboxes://list, emails://recent)
+  - Improved config schema with optional fields (defaultMailbox, maxResults)
+  - Enhanced smithery.json with full metadata and capabilities
 - 2024-12-05: Added Smithery deployment configuration
   - Added HTTP transport support (Streamable HTTP)
   - Server can run in stdio mode (local) or HTTP mode (Smithery)
@@ -45,12 +51,22 @@ The MCP server is implemented and ready to use with MCP-compatible clients (Clau
    - Email search, retrieval, and mailbox listing
    - Async HTTP client using httpx
 
-2. **MCP Server**: Exposes tools via stdio
+2. **MCP Server**: Exposes tools via stdio or HTTP
    - search_emails: Search by text/mailbox
    - get_email: Retrieve full email content
    - list_mailboxes: List all folders
 
-3. **Authentication**: Bearer token authentication
+3. **MCP Prompts**: Pre-defined prompts for common tasks
+   - check_inbox: Check recent inbox emails
+   - search_from_sender: Find emails from specific sender
+   - check_unread: Check unread counts
+   - find_attachments: Find emails with attachments
+
+4. **MCP Resources**: Exposed data resources
+   - mailboxes://list: All mailboxes with counts
+   - emails://recent: Recent inbox emails
+
+5. **Authentication**: Bearer token authentication
    - API token from Fastmail settings
    - Secure environment variable storage
 
@@ -96,14 +112,29 @@ Add to `claude_desktop_config.json`:
    - Search emails by query text
    - Filter by mailbox (inbox, sent, etc.)
    - Limit results (max 50)
+   - Annotations: readOnly, idempotent
 
 2. **get_email**
    - Retrieve full email by ID
    - Includes body, attachments, metadata
+   - Annotations: readOnly, idempotent
 
 3. **list_mailboxes**
    - List all folders
    - Shows email counts (total, unread)
+   - Annotations: readOnly, idempotent
+
+### Available MCP Prompts
+
+1. **check_inbox**: Check your inbox for recent emails
+2. **search_from_sender**: Search for emails from a specific sender
+3. **check_unread**: Check for unread emails across mailboxes
+4. **find_attachments**: Find emails with attachments about a topic
+
+### Available MCP Resources
+
+1. **mailboxes://list**: List of all mailboxes with email counts
+2. **emails://recent**: Most recent 10 emails from inbox
 
 ## Security Notes
 - API token provides full account access
