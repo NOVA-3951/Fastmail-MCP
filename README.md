@@ -60,7 +60,7 @@ Add this to your Claude Desktop config file:
   "mcpServers": {
     "fastmail": {
       "command": "python",
-      "args": ["/absolute/path/to/src/fastmail_mcp.py"],
+      "args": ["/absolute/path/to/fastmail_mcp.py"],
       "env": {
         "FASTMAIL_API_TOKEN": "your_fastmail_api_token_here"
       }
@@ -76,7 +76,7 @@ Replace `/absolute/path/to/` with the actual path to this project.
 For other MCP-compatible clients (VS Code, Cursor, etc.), configure them to run:
 
 ```bash
-python /path/to/src/fastmail_mcp.py
+python /path/to/fastmail_mcp.py
 ```
 
 Make sure to set the `FASTMAIL_API_TOKEN` environment variable.
@@ -130,10 +130,10 @@ The server supports both stdio (local) and HTTP (remote) transports:
 
 ```bash
 # Run in HTTP mode on port 8000
-python src/fastmail_mcp.py --http
+python fastmail_mcp.py --http
 
 # Run in stdio mode (default, for local use)
-python src/fastmail_mcp.py
+python fastmail_mcp.py
 ```
 
 ## Available Tools
@@ -176,7 +176,7 @@ List all mailboxes with their email counts.
 You can test the MCP server using the MCP Inspector:
 
 ```bash
-npx @modelcontextprotocol/inspector python src/fastmail_mcp.py
+npx @modelcontextprotocol/inspector python fastmail_mcp.py
 ```
 
 This opens a web UI where you can manually test the tools.
