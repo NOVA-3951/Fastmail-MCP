@@ -1,0 +1,148 @@
+[5:13:50 AM] Starting deployment...
+[5:13:50 AM] Fetching commit information...
+[5:13:50 AM] Commit: 3d2c171
+[5:13:50 AM] Creating GitHub deployment...
+[5:13:51 AM] GitHub deployment initialized
+[5:13:51 AM] Cloning repository...
+[5:13:52 AM] Validating files...
+[5:13:52 AM] Unexpected fields found in smithery.yaml: startCommand. For Python runtime, only 'runtime' and 'env' fields are allowed.
+  Cause: Unexpected fields: startCommand
+[5:13:52 AM] Smithery dependency not found in pyproject.toml
+  Cause: {
+  "minimumVersion": "0.3.1"
+}
+[5:13:52 AM] Build files validated
+[5:13:53 AM] Deployment credentials configured
+[5:13:53 AM] Preparing build files...
+[5:13:53 AM] Build files prepared
+[5:13:53 AM] Building Docker image...
+[5:13:55 AM] #5 transferring dockerfile:
+[5:13:55 AM] #5 transferring dockerfile: 3.77kB 0.2s done
+[5:13:55 AM] #6 DONE 0.0s
+[5:13:55 AM] #5 DONE 0.2s
+[5:13:55 AM] #7 [internal] load metadata for docker.io/library/python:3.12-slim-bookworm
+[5:13:56 AM] #7 ...
+[5:13:56 AM] #8 [internal] load metadata for ghcr.io/astral-sh/uv:0.5.16
+[5:13:56 AM] #8 DONE 0.3s
+[5:13:56 AM] #7 [internal] load metadata for docker.io/library/python:3.12-slim-bookworm
+[5:13:56 AM] #7 DONE 0.4s
+[5:13:56 AM] #9 [internal] load .dockerignore
+[5:13:56 AM] #9 transferring context: 0.1s
+[5:13:56 AM] #9 transferring context: 2B 0.1s done
+[5:13:56 AM] #9 DONE 0.2s
+[5:13:56 AM] #10 [base 1/1] FROM docker.io/library/python:3.12-slim-bookworm@sha256:78e702aee4d693e769430f0d7b4f4858d8ea3f1118dc3f57fee3f757d0ca64b1
+[5:13:56 AM] #10 resolve docker.io/library/python:3.12-slim-bookworm@sha256:78e702aee4d693e769430f0d7b4f4858d8ea3f1118dc3f57fee3f757d0ca64b1 0.0s done
+[5:13:56 AM] #10 DONE 0.0s
+[5:13:56 AM] #11 FROM ghcr.io/astral-sh/uv:0.5.16@sha256:feebeb26b63566bb53d53031dee5497e49a0aa66feffd33aabe2e98307c72f6d
+[5:13:56 AM] #11 resolve ghcr.io/astral-sh/uv:0.5.16@sha256:feebeb26b63566bb53d53031dee5497e49a0aa66feffd33aabe2e98307c72f6d 0.0s done
+[5:13:56 AM] #11 DONE 0.0s
+[5:13:56 AM] #12 DONE 0.0s
+[5:13:56 AM] #13 [internal] load build context
+[5:13:56 AM] #13 transferring context: 96.44kB 0.3s done
+[5:13:56 AM] #13 DONE 0.3s
+[5:13:56 AM] #14 [builder 1/4] WORKDIR /app
+[5:13:56 AM] #14 CACHED
+[5:13:56 AM] #11 FROM ghcr.io/astral-sh/uv:0.5.16@sha256:feebeb26b63566bb53d53031dee5497e49a0aa66feffd33aabe2e98307c72f6d
+[5:13:56 AM] #11 CACHED
+[5:13:56 AM] #15 [builder 2/4] COPY . .
+[5:13:57 AM] #15 DONE 0.3s
+[5:13:57 AM] #16 [builder 3/4] COPY --from=ghcr.io/astral-sh/uv:0.5.16 /uv /bin/uv
+[5:13:57 AM] #16 DONE 0.2s
+[5:13:57 AM] #17 [builder 4/4] RUN if [ -f "uv.lock" ]; then       echo "Using uv with uv.lock" &&       export UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy &&       uv sync --frozen --no-dev;     elif [ -f "poetry.lock" ]; then       echo "Using poetry with poetry.lock" &&       export PYTHONUNBUFFERED=1         PYTHONDONTWRITEBYTECODE=1         PIP_NO_CACHE_DIR=off         PIP_DISABLE_PIP_VERSION_CHECK=on         POETRY_HOME="/opt/poetry"         POETRY_VIRTUALENVS_IN_PROJECT=true         POETRY_NO_INTERACTION=1 &&       export PATH="$POETRY_HOME/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" &&       pip install poetry &&       poetry install --no-dev;     else       echo "Using uv with pyproject.toml" &&       export UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy &&       uv sync --no-dev;     fi
+[5:13:57 AM] #17 0.114 Using uv with pyproject.toml
+[5:13:57 AM] #17 0.314 Using CPython 3.12.12 interpreter at: /usr/local/bin/python3
+[5:13:57 AM] #17 0.314 Creating virtual environment at: .venv
+[5:13:57 AM] #17 0.501 Resolved 33 packages in 185ms
+[5:13:58 AM] #17 1.182   × Failed to build `fastmail-mcp @ file:///app`
+[5:13:58 AM] #17 1.182   ├─▶ The build backend returned an error
+[5:13:58 AM] #17 1.182   ╰─▶ Call to `hatchling.build.build_editable` failed (exit status: 1)
+[5:13:58 AM] #17 1.182
+[5:13:58 AM] #17 1.182       [stderr]
+[5:13:58 AM] #17 1.182       Traceback (most recent call last):
+[5:13:58 AM] #17 1.182         File "<string>", line 11, in <module>
+[5:13:58 AM] #17 1.182         File
+[5:13:58 AM] #17 1.182       "/root/.cache/uv/builds-v0/.tmpeWOBPn/lib/python3.12/site-packages/hatchling/build.py",
+[5:13:58 AM] #17 1.182       line 83, in build_editable
+[5:13:58 AM] #17 1.182           return os.path.basename(next(builder.build(directory=wheel_directory,
+[5:13:58 AM] #17 1.182       versions=["editable"])))
+[5:13:58 AM] #17 1.182
+[5:13:58 AM] #17 1.182       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[5:13:58 AM] #17 1.182         File
+[5:13:58 AM] #17 1.182       "/root/.cache/uv/builds-v0/.tmpeWOBPn/lib/python3.12/site-packages/hatchling/builders/plugin/interface.py",
+[5:13:58 AM] #17 1.182       line 157, in build
+[5:13:58 AM] #17 1.182       line 534, in build_editable_detection
+[5:13:58 AM] #17 1.182           artifact = version_api[version](directory, **build_data)
+[5:13:58 AM] #17 1.182         File
+[5:13:58 AM] #17 1.182           for included_file in self.recurse_selected_project_files():
+[5:13:58 AM] #17 1.182                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[5:13:58 AM] #17 1.182       "/root/.cache/uv/builds-v0/.tmpeWOBPn/lib/python3.12/site-packages/hatchling/builders/plugin/interface.py",
+[5:13:58 AM] #17 1.182                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[5:13:58 AM] #17 1.182         File
+[5:13:58 AM] #17 1.182       "/root/.cache/uv/builds-v0/.tmpeWOBPn/lib/python3.12/site-packages/hatchling/builders/wheel.py",
+[5:13:58 AM] #17 1.182       line 522, in build_editable
+[5:13:58 AM] #17 1.182           return self.build_editable_detection(directory, **build_data)
+[5:13:58 AM] #17 1.182                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[5:13:58 AM] #17 1.182         File
+[5:13:58 AM] #17 1.182       "/root/.cache/uv/builds-v0/.tmpeWOBPn/lib/python3.12/site-packages/hatchling/builders/wheel.py",
+[5:13:58 AM] #17 1.182       line 182, in recurse_selected_project_files
+[5:13:58 AM] #17 1.182         File "/usr/local/lib/python3.12/functools.py", line 998, in __get__
+[5:13:58 AM] #17 1.182           if self.config.only_include:
+[5:13:58 AM] #17 1.182       "/root/.cache/uv/builds-v0/.tmpeWOBPn/lib/python3.12/site-packages/hatchling/builders/config.py",
+[5:13:58 AM] #17 1.182           val = self.func(instance)
+[5:13:58 AM] #17 1.182           only_include = only_include_config.get("only-include",
+[5:13:58 AM] #17 1.182              ^^^^^^^^^^^^^^^^^^^^^^^^
+[5:13:58 AM] #17 1.182       line 715, in only_include
+[5:13:58 AM] #17 1.182                 ^^^^^^^^^^^^^^^^^^^
+[5:13:58 AM] #17 1.182       self.default_only_include()) or self.packages
+[5:13:58 AM] #17 1.182         File
+[5:13:58 AM] #17 1.182
+[5:13:58 AM] #17 1.182       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[5:13:58 AM] #17 1.182         File
+[5:13:58 AM] #17 1.182           val = self.func(instance)
+[5:13:58 AM] #17 1.182       "/root/.cache/uv/builds-v0/.tmpeWOBPn/lib/python3.12/site-packages/hatchling/builders/wheel.py",
+[5:13:58 AM] #17 1.182                 ^^^^^^^^^^^^^^^^^^^
+[5:13:58 AM] #17 1.182       line 256, in default_file_selection_options
+[5:13:58 AM] #17 ERROR: process "/bin/sh -c if [ -f \"uv.lock\" ]; then       echo \"Using uv with uv.lock\" &&       export UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy &&       uv sync --frozen --no-dev;     elif [ -f \"poetry.lock\" ]; then       echo \"Using poetry with poetry.lock\" &&       export PYTHONUNBUFFERED=1         PYTHONDONTWRITEBYTECODE=1         PIP_NO_CACHE_DIR=off         PIP_DISABLE_PIP_VERSION_CHECK=on         POETRY_HOME=\"/opt/poetry\"         POETRY_VIRTUALENVS_IN_PROJECT=true         POETRY_NO_INTERACTION=1 &&       export PATH=\"$POETRY_HOME/bin:$PATH\" &&       pip install poetry &&       poetry install --no-dev;     else       echo \"Using uv with pyproject.toml\" &&       export UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy &&       uv sync --no-dev;     fi" did not complete successfully: exit code: 1
+[5:13:58 AM] #17 1.182       line 268, in default_only_include
+[5:13:58 AM] #17 1.182         File
+[5:13:58 AM] #17 1.182           raise ValueError(message)
+[5:13:58 AM] ------
+[5:13:58 AM] #17 1.182           return self.default_file_selection_options.only_include
+[5:13:58 AM] #17 1.182       "/root/.cache/uv/builds-v0/.tmpeWOBPn/lib/python3.12/site-packages/hatchling/builders/wheel.py",
+[5:13:58 AM] #17 1.182       ValueError: Unable to determine which files to ship
+[5:13:58 AM] > [builder 4/4] RUN if [ -f "uv.lock" ]; then       echo "Using uv with uv.lock" &&       export UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy &&       uv sync --frozen --no-dev;     elif [ -f "poetry.lock" ]; then       echo "Using poetry with poetry.lock" &&       export PYTHONUNBUFFERED=1         PYTHONDONTWRITEBYTECODE=1         PIP_NO_CACHE_DIR=off         PIP_DISABLE_PIP_VERSION_CHECK=on         POETRY_HOME="/opt/poetry"         POETRY_VIRTUALENVS_IN_PROJECT=true         POETRY_NO_INTERACTION=1 &&       export PATH="$POETRY_HOME/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" &&       pip install poetry &&       poetry install --no-dev;     else       echo "Using uv with pyproject.toml" &&       export UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy &&       uv sync --no-dev;     fi:
+[5:13:58 AM] #17 1.182                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[5:13:58 AM] #17 1.182       inside the wheel using the following heuristics:
+[5:13:58 AM] #17 1.182
+[5:13:58 AM] #17 1.182         File "/usr/local/lib/python3.12/functools.py", line 998, in __get__
+[5:13:58 AM] #17 1.182       https://hatch.pypa.io/latest/plugins/builder/wheel/#default-file-selection
+[5:13:58 AM] #17 1.182       As an example, if you intend to ship a directory named `foo` that
+[5:13:58 AM] #17 1.182
+[5:13:58 AM] #17 1.182       resides within a `src` directory located at the root of your project,
+[5:13:58 AM] #17 1.182       The most likely cause of this is that there is no directory that matches
+[5:13:58 AM] #17 1.182       you can define the following:
+[5:13:58 AM] #17 1.182       the name of your project (fastmail_mcp).
+[5:13:58 AM] #17 1.182
+[5:13:58 AM] #17 1.182
+[5:13:58 AM] #17 1.182       [tool.hatch.build.targets.wheel]
+[5:13:58 AM] #17 1.182       At least one file selection option must be defined
+[5:13:58 AM] #17 1.182       packages = ["src/foo"]
+[5:13:58 AM] #17 1.182       in the `tool.hatch.build.targets.wheel` table, see:
+[5:13:58 AM] #17 1.182
+[5:13:58 AM] #17 1.182       https://hatch.pypa.io/latest/config/build/
+[5:13:58 AM] #17 1.182       hint: This usually indicates a problem with the package or the build
+[5:13:58 AM] #17 1.182
+[5:13:58 AM] #17 1.182       environment.
+[5:13:58 AM] #17 1.182       As an example, if you intend to ship a directory named `foo` that
+[5:13:58 AM] ------
+[5:13:58 AM] #17 1.182       resides within a `src` directory located at the root of your project,
+[5:13:58 AM] #17 1.182       you can define the following:
+[5:13:58 AM] #17 1.182
+[5:13:58 AM] #17 1.182       [tool.hatch.build.targets.wheel]
+[5:13:58 AM] #17 1.182       packages = ["src/foo"]
+[5:13:58 AM] #17 1.182
+[5:13:58 AM] #17 1.182       hint: This usually indicates a problem with the package or the build
+[5:13:58 AM] #17 1.182       environment.
+[5:13:58 AM] [1;36m
+[5:13:58 AM] Error: failed to solve: process "/bin/sh -c if [ -f \"uv.lock\" ]; then       echo \"Using uv with uv.lock\" &&       export UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy &&       uv sync --frozen --no-dev;     elif [ -f \"poetry.lock\" ]; then       echo \"Using poetry with poetry.lock\" &&       export PYTHONUNBUFFERED=1         PYTHONDONTWRITEBYTECODE=1         PIP_NO_CACHE_DIR=off         PIP_DISABLE_PIP_VERSION_CHECK=on         POETRY_HOME=\"/opt/poetry\"         POETRY_VIRTUALENVS_IN_PROJECT=true         POETRY_NO_INTERACTION=1 &&       export PATH=\"$POETRY_HOME/bin:$PATH\" &&       pip install poetry &&       poetry install --no-dev;     else       echo \"Using uv with pyproject.toml\" &&       export UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy &&       uv sync --no-dev;     fi" did not complete successfully: exit code: 1
+[5:13:58 AM] Deploy failed: Failed to build server. Run `uv run smithery dev` or `uv run smithery playground` to check if it works locally. If it works locally but fails here, contact support or try again later.

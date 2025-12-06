@@ -9,8 +9,21 @@ dependencies = [
     "mcp>=1.1.0",
     "httpx>=0.27.0",
     "python-dotenv>=1.0.0",
+    "smithery>=0.3.1",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.smithery]
+module = "src.fastmail_mcp"
+object = "mcp"
+
+[tool.smithery.config]
+fastmailApiToken = { type = "string", title = "Fastmail API Token", description = "Your Fastmail API token. Get one from https://app.fastmail.com/settings/security/tokens/new", required = true, env = "FASTMAIL_API_TOKEN" }
+defaultMailbox = { type = "string", title = "Default Mailbox", description = "Default mailbox to search (e.g., inbox, sent)", default = "" }
+maxResults = { type = "number", title = "Max Results", description = "Maximum emails to return (default: 10, max: 50)", default = 10 }

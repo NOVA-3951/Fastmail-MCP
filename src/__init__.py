@@ -1,0 +1,1 @@
+# Fastmail MCP Server package
