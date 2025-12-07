@@ -6,7 +6,16 @@ from typing import Optional
 from mcp.server.fastmcp import FastMCP
 from mcp.types import TextContent, ToolAnnotations
 
-FASTMAIL_API_TOKEN = os.getenv("FASTMAIL_API_TOKEN", "")
+
+def get_api_token() -> str:
+    """Get Fastmail API token from various environment variable formats."""
+    return (
+        os.getenv("FASTMAIL_API_TOKEN", "") or
+        os.getenv("fastmailApiToken", "") or
+        os.getenv("fastmail_api_token", "")
+    )
+
+
 SESSION_URL = "https://api.fastmail.com/jmap/session"
 
 
@@ -134,7 +143,7 @@ fastmail_client = None
 def get_client() -> FastmailClient:
     global fastmail_client
     if fastmail_client is None:
-        token = os.getenv("FASTMAIL_API_TOKEN", "")
+        token = get_api_token()
         if not token:
             raise ValueError("FASTMAIL_API_TOKEN is not configured. Please provide your Fastmail API token in the configuration.")
         fastmail_client = FastmailClient(token)
@@ -142,7 +151,7 @@ def get_client() -> FastmailClient:
 
 
 def is_token_configured() -> bool:
-    return bool(os.getenv("FASTMAIL_API_TOKEN", ""))
+    return bool(get_api_token())
 
 
 @mcp.tool(

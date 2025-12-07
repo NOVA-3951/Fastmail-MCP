@@ -1,1 +1,31 @@
-runtime: docker
+runtime: "container"
+
+build:
+  dockerfile: "Dockerfile"
+  dockerBuildPath: "."
+
+startCommand:
+  type: "http"
+  configSchema:
+    type: "object"
+    required:
+      - "fastmailApiToken"
+    properties:
+      fastmailApiToken:
+        type: "string"
+        title: "Fastmail API Token"
+        description: "Your Fastmail API token. Get one from https://app.fastmail.com/settings/security/tokens/new"
+      defaultMailbox:
+        type: "string"
+        title: "Default Mailbox"
+        description: "Default mailbox to search (e.g., inbox, sent)"
+        default: ""
+      maxResults:
+        type: "number"
+        title: "Max Results"
+        description: "Maximum emails to return (default: 10, max: 50)"
+        default: 10
+  exampleConfig:
+    fastmailApiToken: "fmu1-your-api-token-here"
+    defaultMailbox: "inbox"
+    maxResults: 10
