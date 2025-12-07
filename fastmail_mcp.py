@@ -8,11 +8,20 @@ from mcp.types import TextContent, ToolAnnotations
 
 
 def get_api_token() -> str:
-    """Get Fastmail API token from various environment variable formats."""
+    """Get Fastmail API token from various environment variable formats.
+    
+    Smithery may pass config as environment variables with different naming conventions.
+    """
     return (
         os.getenv("FASTMAIL_API_TOKEN", "") or
         os.getenv("fastmailApiToken", "") or
-        os.getenv("fastmail_api_token", "")
+        os.getenv("fastmail_api_token", "") or
+        os.getenv("CONFIG_FASTMAIL_API_TOKEN", "") or
+        os.getenv("CONFIG_fastmailApiToken", "") or
+        os.getenv("SMITHERY_FASTMAIL_API_TOKEN", "") or
+        os.getenv("SMITHERY_fastmailApiToken", "") or
+        os.getenv("MCP_FASTMAIL_API_TOKEN", "") or
+        os.getenv("MCP_fastmailApiToken", "")
     )
 
 
