@@ -3,25 +3,35 @@ import os
 import asyncio
 import httpx
 from typing import Optional
+from contextvars import ContextVar
 from mcp.server.fastmcp import FastMCP
 from mcp.types import TextContent, ToolAnnotations
 
+_request_config: Optional[ContextVar[dict]] = None
+
+
+def set_request_config_var(config_var: ContextVar[dict]):
+    """Set the context variable used for request-scoped configuration."""
+    global _request_config
+    _request_config = config_var
+
 
 def get_api_token() -> str:
-    """Get Fastmail API token from various environment variable formats.
+    """Get Fastmail API token from query parameters or environment variables.
     
-    Smithery may pass config as environment variables with different naming conventions.
+    For Smithery HTTP transport, config is passed as query parameters.
+    For local stdio usage, config comes from environment variables.
     """
+    if _request_config is not None:
+        config = _request_config.get({})
+        token = config.get("fastmailApiToken") or config.get("FASTMAIL_API_TOKEN")
+        if token:
+            return token
+    
     return (
         os.getenv("FASTMAIL_API_TOKEN", "") or
         os.getenv("fastmailApiToken", "") or
-        os.getenv("fastmail_api_token", "") or
-        os.getenv("CONFIG_FASTMAIL_API_TOKEN", "") or
-        os.getenv("CONFIG_fastmailApiToken", "") or
-        os.getenv("SMITHERY_FASTMAIL_API_TOKEN", "") or
-        os.getenv("SMITHERY_fastmailApiToken", "") or
-        os.getenv("MCP_FASTMAIL_API_TOKEN", "") or
-        os.getenv("MCP_fastmailApiToken", "")
+        os.getenv("fastmail_api_token", "")
     )
 
 

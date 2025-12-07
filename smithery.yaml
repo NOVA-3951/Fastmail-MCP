@@ -5,7 +5,7 @@ build:
   dockerBuildPath: "."
 
 startCommand:
-  type: "stdio"
+  type: "http"
   configSchema:
     type: "object"
     required:
@@ -25,11 +25,3 @@ startCommand:
         title: "Max Results"
         description: "Maximum emails to return (default: 10, max: 50)"
         default: 10
-  commandFunction: |-
-    (config) => ({
-      command: 'python',
-      args: ['fastmail_mcp.py'],
-      env: {
-        FASTMAIL_API_TOKEN: config.fastmailApiToken
-      }
-    })

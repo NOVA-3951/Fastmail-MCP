@@ -1,35 +1,40 @@
 #!/usr/bin/env python3
 """
-Explicit HTTP entry point for Smithery deployment.
-This file starts the MCP server in HTTP mode for remote access.
+HTTP entry point for Smithery deployment.
+Handles configuration from query parameters as required by Smithery HTTP transport.
 """
 import os
 import uvicorn
+from contextvars import ContextVar
 from starlette.applications import Starlette
-from starlette.routing import Mount, Route
-from starlette.responses import JSONResponse
+from starlette.routing import Route
+from starlette.responses import JSONResponse, Response
+from starlette.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
 import contextlib
 
-from fastmail_mcp import mcp
+request_config: ContextVar[dict] = ContextVar("request_config", default={})
+
+from fastmail_mcp import mcp, set_request_config_var
+
+set_request_config_var(request_config)
+
+class ConfigMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        config = dict(request.query_params)
+        token = request_config.set(config)
+        try:
+            response = await call_next(request)
+            return response
+        finally:
+            request_config.reset(token)
 
 mcp.settings.stateless_http = True
 mcp.settings.host = "0.0.0.0"
 
 mcp.settings.transport_security.enable_dns_rebinding_protection = False
-mcp.settings.transport_security.allowed_hosts = [
-    "*",
-    "smithery.run:*",
-    "*.smithery.run:*",
-    "localhost:*",
-    "127.0.0.1:*",
-]
-mcp.settings.transport_security.allowed_origins = [
-    "*",
-    "https://smithery.run",
-    "https://*.smithery.run",
-    "http://localhost:*",
-    "http://127.0.0.1:*",
-]
+mcp.settings.transport_security.allowed_hosts = ["*"]
+mcp.settings.transport_security.allowed_origins = ["*"]
 
 mcp_http_app = mcp.streamable_http_app()
 
@@ -39,31 +44,53 @@ async def lifespan(app):
         yield
 
 async def health_check(request):
-    return JSONResponse({"status": "ok"})
+    return JSONResponse({"status": "ok", "service": "fastmail-mcp"})
 
-async def debug_env(request):
-    """Debug endpoint to check environment variables (remove in production)."""
-    env_vars = {k: v[:20] + "..." if len(v) > 20 else v 
-                for k, v in os.environ.items() 
-                if "token" in k.lower() or "api" in k.lower() or "key" in k.lower() or "fastmail" in k.lower()}
-    return JSONResponse({
-        "token_found": bool(os.getenv("FASTMAIL_API_TOKEN") or os.getenv("fastmailApiToken")),
-        "env_hints": list(env_vars.keys())
-    })
+async def mcp_handler(request):
+    config = dict(request.query_params)
+    token = request_config.set(config)
+    try:
+        response = await mcp_http_app(request.scope, request.receive, request._send)
+        return response
+    except Exception:
+        scope = request.scope
+        receive = request.receive
+        
+        async def send(message):
+            pass
+        
+        await mcp_http_app(scope, receive, send)
+        return Response(status_code=200)
+    finally:
+        request_config.reset(token)
+
+async def mcp_options(request):
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, mcp-session-id, *",
+            "Access-Control-Expose-Headers": "mcp-session-id, mcp-protocol-version",
+        }
+    )
+
+from starlette.routing import Mount
 
 app = Starlette(
     routes=[
-        Route("/health", health_check),
-        Route("/debug", debug_env),
+        Route("/health", health_check, methods=["GET"]),
         Mount("/mcp", app=mcp_http_app),
         Mount("/", app=mcp_http_app),
     ],
+    middleware=[Middleware(ConfigMiddleware)],
     lifespan=lifespan
 )
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", "8000"))
+    port = int(os.getenv("PORT", "8081"))
     host = os.getenv("HOST", "0.0.0.0")
+    print(f"Starting Fastmail MCP server on {host}:{port}")
     uvicorn.run(
         app, 
         host=host, 

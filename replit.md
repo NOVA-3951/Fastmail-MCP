@@ -13,11 +13,15 @@ This is an MCP (Model Context Protocol) server that enables AI assistants like C
 The MCP server is implemented and ready to use with MCP-compatible clients (Claude Desktop, VS Code, Cursor, etc.).
 
 ## Recent Changes
+- 2024-12-07: Fixed Smithery HTTP transport configuration
+  - Config is now properly received from query parameters (Smithery HTTP requirement)
+  - Server binds to port 8081 (Smithery's required PORT)
+  - Added context variable system to pass config from HTTP requests to tools
+  - Updated smithery.yaml to use HTTP transport (container runtime requires HTTP, not STDIO)
 - 2024-12-06: Fixed Smithery deployment
   - Switched to Docker runtime for reliable HTTP deployment
   - Created explicit main.py entry point for HTTP server
   - Moved fastmail_mcp.py to root level for simpler imports
-  - Server now properly binds to port 8000 with Streamable HTTP transport
 - 2024-12-06: Enhanced Smithery quality score
   - Added tool annotations (readOnlyHint, destructiveHint, idempotentHint, openWorldHint)
   - Added MCP prompts (check_inbox, search_from_sender, check_unread, find_attachments)

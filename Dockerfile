@@ -8,9 +8,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY fastmail_mcp.py .
 COPY main.py .
 
-ENV PORT=8000
-ENV HOST=0.0.0.0
-
-EXPOSE 8000
+EXPOSE 8081
 
 CMD ["python", "main.py"]
