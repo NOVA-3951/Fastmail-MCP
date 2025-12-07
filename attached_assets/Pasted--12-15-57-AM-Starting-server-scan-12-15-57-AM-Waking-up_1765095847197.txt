@@ -1,0 +1,36 @@
+[12:15:57 AM] Starting server scan
+[12:15:57 AM] Waking up server...
+[12:15:57 AM] Setting up authentication...
+[12:15:58 AM] Using test profile configuration
+[12:16:06 AM] Server added to test profile
+[12:16:06 AM] Scanning MCP capabilities...
+[12:16:07 AM] MCP Server Card not found (notFound), proceeding with connection scan
+[12:16:07 AM] Discovered .well-known/mcp-config schema: {"title":"MCP Session Configuration","description":"Schema for the /mcp endpoint configuration","x-query-style":"dot+bracket","type":"object","required":["fastmailApiToken"],"properties":{"fastmailApiToken":{"type":"string","description":"Your Fastmail API token. Get one from https://app.fastmail.com/settings/security/tokens/new"},"defaultMailbox":{"type":"string","default":"","description":"Default mailbox to search (e.g., inbox, sent)"},"maxResults":{"type":"number","default":10,"description":"Maximum emails to return (default: 10, max: 50)"}}}
+[12:16:07 AM] Scanning MCP server: https://smithery.run/sessions/variable-earwig-c1ZHPa/fastmail/mcp
+[12:16:07 AM] HTTP POST → 502 Bad Gateway (555ms)
+{"jsonrpc":"2.0","id":756986746,"error":{"code":-32000,"message":"Error POSTing to endpoint (HTTP 421): Invalid Host header"}}
+[12:16:07 AM] Request: {"jsonrpc":"2.0","id":756986746,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"smithery-scanner","version":"1.0.0"}}}
+[12:16:09 AM] HTTP POST → 502 Bad Gateway (550ms)
+{"jsonrpc":"2.0","id":824103246,"error":{"code":-32000,"message":"Error POSTing to endpoint (HTTP 421): Invalid Host header"}}
+[12:16:09 AM] Request: {"jsonrpc":"2.0","id":824103246,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"smithery-scanner","version":"1.0.0"}}}
+[12:16:10 AM] HTTP POST → 502 Bad Gateway (749ms)
+{"jsonrpc":"2.0","id":264744557,"error":{"code":-32000,"message":"Error POSTing to endpoint (HTTP 421): Invalid Host header"}}
+[12:16:10 AM] Request: {"jsonrpc":"2.0","id":264744557,"method":"tools/list","params":{}}
+[12:16:10 AM] HTTP POST → 502 Bad Gateway (886ms)
+{"jsonrpc":"2.0","id":325983050,"error":{"code":-32000,"message":"Error POSTing to endpoint (HTTP 421): Invalid Host header"}}
+[12:16:10 AM] Request: {"jsonrpc":"2.0","id":325983050,"method":"prompts/list","params":{}}
+[12:16:10 AM] HTTP POST → 502 Bad Gateway (1074ms)
+{"jsonrpc":"2.0","id":89711133,"error":{"code":-32000,"message":"Error POSTing to endpoint (HTTP 421): Invalid Host header"}}
+[12:16:10 AM] Request: {"jsonrpc":"2.0","id":89711133,"method":"resources/list","params":{}}
+[12:16:11 AM] HTTP POST → 502 Bad Gateway (479ms)
+{"jsonrpc":"2.0","id":15306505,"error":{"code":-32000,"message":"Error POSTing to endpoint (HTTP 421): Invalid Host header"}}
+[12:16:11 AM] Request: {"jsonrpc":"2.0","id":15306505,"method":"tools/list","params":{}}
+[12:16:11 AM] HTTP POST → 502 Bad Gateway (771ms)
+{"jsonrpc":"2.0","id":577913017,"error":{"code":-32000,"message":"Error POSTing to endpoint (HTTP 421): Invalid Host header"}}
+[12:16:11 AM] Request: {"jsonrpc":"2.0","id":577913017,"method":"prompts/list","params":{}}
+[12:16:12 AM] HTTP POST → 502 Bad Gateway (1621ms)
+{"jsonrpc":"2.0","id":972891260,"error":{"code":-32000,"message":"Error POSTing to endpoint (HTTP 421): Invalid Host header"}}
+[12:16:12 AM] Request: {"jsonrpc":"2.0","id":972891260,"method":"resources/list","params":{}}
+[12:16:12 AM] Extracted 0 tools
+[12:16:12 AM] Capabilities found: 0 tools, 0 prompts, 0 resources
+[12:16:13 AM] Scan completed: 0 tools, 0 prompts, 0 resources
